@@ -3,17 +3,70 @@
 @section('title', 'Invoice - ' . $sale->reference_no)
 
 @section('content')
+<style>
+    @media print {
+        /* Remove layout parts completely (they no longer take space) */
+        .sidebar, #sidebar, aside, nav, .navbar, header, footer,
+        .main-header, .main-footer, .topbar, .d-print-none {
+            display: none !important;
+        }
+
+        /* Remove grey background and spacing from the layout */
+        html, body {
+            background: #fff !important;
+            height: auto !important;
+            min-height: 0 !important;
+            overflow: visible !important;
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+
+        /* Layout wrappers: remove side margin, padding and fixed heights */
+        body *:not(#invoice-area):not(#invoice-area *) {
+            min-height: 0 !important;
+            height: auto !important;
+            margin-left: 0 !important;
+            padding-top: 0 !important;
+            padding-bottom: 0 !important;
+        }
+
+        .container {
+            max-width: 100% !important;
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+
+        #invoice-area {
+            box-shadow: none !important;
+            border: none !important;
+            margin: 0 !important;
+            width: 100% !important;
+            page-break-inside: avoid;
+        }
+
+        * {
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+
+        @page {
+            size: A4;
+            margin: 10mm;
+        }
+    }
+</style>
+
 <div class="container my-4">
     <div class="d-flex justify-content-between align-items-center mb-3 d-print-none">
         <a href="{{ route('sales.index') }}" class="btn btn-outline-secondary">
             <i class="fa-solid fa-arrow-left me-1"></i> Back to Sales
         </a>
-        <button onclick="window.print()" class="btn btn-primary">
+        <button onclick="window.print()" class="btn border">
             <i class="fa-solid fa-print me-1"></i> Print Invoice
         </button>
     </div>
 
-    <div class="card p-4 shadow-sm border-0 bg-white">
+    <div id="invoice-area" class="card p-4 shadow-sm border-0 bg-white">
         <!-- Invoice Header -->
         <div class="d-flex justify-content-between align-items-center border-bottom pb-3 mb-4">
             <div>
@@ -34,7 +87,7 @@
             </div>
             <div class="col-6 text-end">
                 <h6 class="text-muted text-uppercase mb-1 fs-7">Payment Status:</h6>
-                <span class="badge {{ strtolower($sale->payment_status) == 'paid' ? 'bg-success' : 'bg-warning' }} fs-6 px-3 py-2">
+                <span class="badge {{ strtolower($sale->payment_status) == 'paid' ? 'bg-success' : 'bg-warning text-dark' }} fs-6 px-3 py-2">
                     {{ $sale->payment_status }}
                 </span>
             </div>
@@ -57,7 +110,7 @@
                         <tr>
                             <td class="text-center fw-bold text-muted">{{ $index + 1 }}</td>
                             <td>
-                                <strong class="text-primary">[{{ $item->product->code ?? 'N/A' }}]</strong> 
+                                <strong class="text-primary">[{{ $item->product->code ?? 'N/A' }}]</strong>
                                 <span class="fw-semibold">{{ $item->product->name ?? 'Product' }}</span>
                             </td>
                             <td class="text-end">${{ number_format($item->unit_price, 2) }}</td>
